@@ -1,25 +1,24 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
-import { weeklyPlan } from '@/lib/data';
-import { Flame, TrendingDown, Clock, ChevronRight } from 'lucide-react';
+import { Flame, TrendingDown, Clock, ChevronRight, Tag, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import frizoLogo from '@/assets/frizo-logo.png';
+import { todayOffers } from '@/lib/offers';
+import RecipeDetail from '@/components/RecipeDetail';
+import type { Meal } from '@/lib/data';
 
 const Home = () => {
-  const { budget, spent, streak } = useApp();
+  const { budget, spent, streak, mealPlan } = useApp();
   const navigate = useNavigate();
-  const today = weeklyPlan[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
+  const todayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+  const today = mealPlan[todayIndex];
   const saved = budget - spent;
   const budgetPercent = Math.min((spent / budget) * 100, 100);
+  const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
 
-  const container = {
-    hidden: {},
-    show: { transition: { staggerChildren: 0.08 } },
-  };
-  const item = {
-    hidden: { opacity: 0, y: 15 },
-    show: { opacity: 1, y: 0 },
-  };
+  const container = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
+  const item = { hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0 } };
 
   return (
     <div className="min-h-screen pb-20 px-4 pt-6 max-w-lg mx-auto">
@@ -75,6 +74,40 @@ const Home = () => {
           </motion.div>
         )}
 
+        {/* Today's Offers */}
+        <motion.div variants={item}>
+          <h2 className="text-lg text-foreground mb-3 flex items-center gap-2">
+            <Tag size={18} className="text-primary" /> Today's Offers
+          </h2>
+        </motion.div>
+
+        <motion.div variants={item} className="flex gap-3 overflow-x-auto pb-3 mb-5 scrollbar-hide">
+          {todayOffers.map(offer => (
+            <div
+              key={offer.id}
+              onClick={() => offer.meals.length === 1 && setSelectedMeal(offer.meals[0])}
+              className="flex-shrink-0 w-56 bg-card rounded-2xl shadow-card p-4 cursor-pointer hover:shadow-elevated transition-shadow border border-border"
+            >
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-3xl">{offer.emoji}</span>
+                <span className="bg-destructive/10 text-destructive text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  {offer.badge}
+                </span>
+              </div>
+              <p className="font-bold text-foreground text-sm leading-tight mb-1">{offer.title}</p>
+              <p className="text-xs text-muted-foreground mb-2">{offer.description}</p>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground line-through">₹{offer.originalPrice}</span>
+                <span className="text-sm font-bold text-primary">₹{offer.offerPrice}</span>
+                <span className="bg-success/10 text-success text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                  {offer.discount}% OFF
+                </span>
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-1">{offer.validTill}</p>
+            </div>
+          ))}
+        </motion.div>
+
         {/* Today's Meals */}
         <motion.div variants={item}>
           <h2 className="text-lg text-foreground mb-3 flex items-center gap-2">
@@ -92,7 +125,7 @@ const Home = () => {
               key={label}
               variants={item}
               whileTap={{ scale: 0.98 }}
-              onClick={() => navigate('/plan')}
+              onClick={() => setSelectedMeal(meal)}
               className="bg-card rounded-2xl p-4 shadow-card flex items-center gap-4 cursor-pointer hover:shadow-elevated transition-shadow"
             >
               <span className="text-3xl">{meal.emoji}</span>
@@ -113,9 +146,11 @@ const Home = () => {
             onClick={() => navigate('/plan')}
             className="bg-secondary rounded-2xl p-4 text-left hover:shadow-card transition-shadow"
           >
-            <span className="text-2xl mb-2 block">📅</span>
-            <p className="font-bold text-secondary-foreground text-sm">Weekly Plan</p>
-            <p className="text-xs text-muted-foreground">7 days of meals</p>
+            <span className="text-2xl mb-2 block">🤖</span>
+            <p className="font-bold text-secondary-foreground text-sm flex items-center gap-1">
+              <Sparkles size={14} /> AI Meal Plan
+            </p>
+            <p className="text-xs text-muted-foreground">Smart weekly meals</p>
           </button>
           <button
             onClick={() => navigate('/groceries')}
@@ -127,6 +162,8 @@ const Home = () => {
           </button>
         </motion.div>
       </motion.div>
+
+      <RecipeDetail meal={selectedMeal} open={!!selectedMeal} onClose={() => setSelectedMeal(null)} />
     </div>
   );
 };
