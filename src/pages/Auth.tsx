@@ -53,16 +53,14 @@ const Auth = () => {
       >
         {/* Logo */}
         <div className="text-center mb-8">
-          <motion.div
+          <motion.img
+            src={frizoLogo}
+            alt="Frizo - Plan. Shop. Eat!"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', delay: 0.1 }}
-            className="text-6xl mb-3"
-          >
-            🍳
-          </motion.div>
-          <h1 className="text-4xl text-primary-foreground mb-1">Frizo</h1>
-          <p className="text-primary-foreground/70 font-semibold">Your Daily Meal Partner</p>
+            className="w-48 h-48 object-contain mx-auto mb-2 drop-shadow-lg"
+          />
         </div>
 
         {/* Form Card */}
