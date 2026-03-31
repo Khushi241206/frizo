@@ -3,6 +3,7 @@ import { useApp } from '@/context/AppContext';
 import { weeklyPlan } from '@/lib/data';
 import { Flame, TrendingDown, Clock, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import frizoLogo from '@/assets/frizo-logo.png';
 
 const Home = () => {
   const { budget, spent, streak } = useApp();
