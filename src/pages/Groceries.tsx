@@ -1,81 +1,277 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
-import { ShoppingCart, Check, CreditCard, Package } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { ShoppingCart, Check, CreditCard, Package, ArrowLeft, Smartphone, Banknote, CheckCircle2 } from 'lucide-react';
+
+type PaymentMethod = 'card' | 'upi' | 'cod' | null;
 
 const Groceries = () => {
   const { groceryList, toggleGroceryItem } = useApp();
-  const navigate = useNavigate();
   const [showPayment, setShowPayment] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(null);
+  const [orderPlaced, setOrderPlaced] = useState(false);
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardCvv, setCardCvv] = useState('');
+  const [upiId, setUpiId] = useState('');
 
   const categories = [...new Set(groceryList.map(i => i.category))];
   const total = groceryList.filter(i => !i.checked).reduce((s, i) => s + i.price, 0);
   const checkedCount = groceryList.filter(i => i.checked).length;
+  const uncheckedItems = groceryList.filter(i => !i.checked);
 
-  if (showPayment) {
+  const handlePlaceOrder = () => {
+    setOrderPlaced(true);
+  };
+
+  const resetPayment = () => {
+    setShowPayment(false);
+    setPaymentMethod(null);
+    setOrderPlaced(false);
+    setCardNumber('');
+    setCardExpiry('');
+    setCardCvv('');
+    setUpiId('');
+  };
+
+  // Order Success Screen
+  if (orderPlaced) {
     return (
-      <div className="min-h-screen pb-20 px-4 pt-6 max-w-lg mx-auto">
+      <div className="min-h-screen pb-20 px-4 pt-6 max-w-lg mx-auto flex items-center justify-center">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center mt-20"
+          className="text-center"
         >
-          <div className="w-20 h-20 gradient-primary rounded-full flex items-center justify-center mx-auto mb-6">
-            <CreditCard className="text-primary-foreground" size={32} />
-          </div>
-          <h1 className="text-2xl text-foreground mb-2">Order Summary</h1>
-          <p className="text-muted-foreground mb-6">{groceryList.filter(i => !i.checked).length} items</p>
-
-          <div className="bg-card rounded-2xl shadow-card p-5 mb-4 text-left">
-            {groceryList.filter(i => !i.checked).map(item => (
-              <div key={item.id} className="flex justify-between py-2 border-b border-border last:border-0">
-                <span className="text-sm text-foreground">{item.name}</span>
-                <span className="text-sm font-bold text-foreground">₹{item.price}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="bg-card rounded-2xl shadow-card p-5 mb-6">
-            <div className="flex justify-between mb-2">
-              <span className="text-muted-foreground">Subtotal</span>
-              <span className="font-bold text-foreground">₹{total}</span>
-            </div>
-            <div className="flex justify-between mb-2">
-              <span className="text-muted-foreground">Delivery</span>
-              <span className="font-bold text-success">FREE</span>
-            </div>
-            <div className="border-t border-border pt-2 flex justify-between">
-              <span className="font-bold text-foreground">Total</span>
-              <span className="font-bold text-primary text-lg">₹{total}</span>
-            </div>
-          </div>
-
-          <button
-            onClick={() => {
-              setShowPayment(false);
-              alert('Order placed! 🎉');
-            }}
-            className="w-full gradient-primary text-primary-foreground font-bold py-4 rounded-2xl shadow-elevated hover:scale-[1.02] transition-transform"
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+            className="w-24 h-24 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-6"
           >
-            Pay ₹{total} 💳
-          </button>
+            <CheckCircle2 className="text-success" size={48} />
+          </motion.div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Order Placed! 🎉</h1>
+          <p className="text-muted-foreground mb-2">{uncheckedItems.length} items on their way</p>
+          <p className="text-sm text-muted-foreground mb-6">
+            Paid via {paymentMethod === 'card' ? 'Card' : paymentMethod === 'upi' ? 'UPI' : 'Cash on Delivery'}
+          </p>
+          <div className="gradient-primary text-primary-foreground text-2xl font-bold py-3 px-6 rounded-2xl inline-block mb-8">
+            ₹{total}
+          </div>
+          <br />
           <button
-            onClick={() => setShowPayment(false)}
-            className="w-full text-muted-foreground font-semibold py-3 mt-2"
+            onClick={resetPayment}
+            className="gradient-primary text-primary-foreground font-bold py-3 px-8 rounded-2xl shadow-elevated"
           >
-            Back to list
+            Back to Groceries
           </button>
         </motion.div>
       </div>
     );
   }
 
+  // Payment Screen
+  if (showPayment) {
+    return (
+      <div className="min-h-screen pb-20 px-4 pt-6 max-w-lg mx-auto">
+        <button onClick={() => { setShowPayment(false); setPaymentMethod(null); }} className="flex items-center gap-2 text-muted-foreground mb-4">
+          <ArrowLeft size={20} /> Back
+        </button>
+
+        <h1 className="text-2xl font-bold text-foreground mb-1">Payment 💳</h1>
+        <p className="text-sm text-muted-foreground mb-5">{uncheckedItems.length} items · ₹{total}</p>
+
+        {/* Order Summary */}
+        <div className="bg-card rounded-2xl shadow-card p-4 mb-5 max-h-40 overflow-y-auto">
+          {uncheckedItems.map(item => (
+            <div key={item.id} className="flex justify-between py-1.5 border-b border-border last:border-0">
+              <span className="text-sm text-foreground">{item.name}</span>
+              <span className="text-sm font-bold text-foreground">₹{item.price}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Payment Methods */}
+        <h2 className="text-sm font-bold text-muted-foreground uppercase mb-3">Choose Payment Method</h2>
+        <div className="space-y-3 mb-5">
+          {[
+            { id: 'card' as const, label: 'Credit / Debit Card', icon: CreditCard, desc: 'Visa, Mastercard, Rupay' },
+            { id: 'upi' as const, label: 'UPI', icon: Smartphone, desc: 'GPay, PhonePe, Paytm' },
+            { id: 'cod' as const, label: 'Cash on Delivery', icon: Banknote, desc: 'Pay when you receive' },
+          ].map(method => (
+            <motion.button
+              key={method.id}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setPaymentMethod(method.id)}
+              className={`w-full bg-card rounded-xl p-4 shadow-card flex items-center gap-4 transition-all border-2 ${
+                paymentMethod === method.id ? 'border-primary' : 'border-transparent'
+              }`}
+            >
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                paymentMethod === method.id ? 'gradient-primary' : 'bg-secondary'
+              }`}>
+                <method.icon size={20} className={paymentMethod === method.id ? 'text-primary-foreground' : 'text-muted-foreground'} />
+              </div>
+              <div className="text-left flex-1">
+                <p className="font-bold text-sm text-foreground">{method.label}</p>
+                <p className="text-xs text-muted-foreground">{method.desc}</p>
+              </div>
+              {paymentMethod === method.id && (
+                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                  <Check size={20} className="text-primary" />
+                </motion.div>
+              )}
+            </motion.button>
+          ))}
+        </div>
+
+        {/* Card Form */}
+        <AnimatePresence>
+          {paymentMethod === 'card' && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden mb-5"
+            >
+              <div className="bg-card rounded-2xl shadow-card p-4 space-y-3">
+                <div>
+                  <label className="text-xs font-bold text-muted-foreground mb-1 block">Card Number</label>
+                  <input
+                    type="text"
+                    placeholder="1234 5678 9012 3456"
+                    maxLength={19}
+                    value={cardNumber}
+                    onChange={e => setCardNumber(e.target.value.replace(/[^\d\s]/g, '').replace(/(\d{4})/g, '$1 ').trim())}
+                    className="w-full bg-secondary text-foreground rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary"
+                  />
+                </div>
+                <div className="flex gap-3">
+                  <div className="flex-1">
+                    <label className="text-xs font-bold text-muted-foreground mb-1 block">Expiry</label>
+                    <input
+                      type="text"
+                      placeholder="MM/YY"
+                      maxLength={5}
+                      value={cardExpiry}
+                      onChange={e => setCardExpiry(e.target.value)}
+                      className="w-full bg-secondary text-foreground rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-xs font-bold text-muted-foreground mb-1 block">CVV</label>
+                    <input
+                      type="password"
+                      placeholder="•••"
+                      maxLength={3}
+                      value={cardCvv}
+                      onChange={e => setCardCvv(e.target.value)}
+                      className="w-full bg-secondary text-foreground rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* UPI Form */}
+        <AnimatePresence>
+          {paymentMethod === 'upi' && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden mb-5"
+            >
+              <div className="bg-card rounded-2xl shadow-card p-4">
+                <label className="text-xs font-bold text-muted-foreground mb-1 block">UPI ID</label>
+                <input
+                  type="text"
+                  placeholder="yourname@upi"
+                  value={upiId}
+                  onChange={e => setUpiId(e.target.value)}
+                  className="w-full bg-secondary text-foreground rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary"
+                />
+                <div className="flex gap-2 mt-3">
+                  {['GPay', 'PhonePe', 'Paytm'].map(app => (
+                    <button
+                      key={app}
+                      onClick={() => setUpiId(`user@${app.toLowerCase()}`)}
+                      className="bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1.5 rounded-full"
+                    >
+                      {app}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* COD Info */}
+        <AnimatePresence>
+          {paymentMethod === 'cod' && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden mb-5"
+            >
+              <div className="bg-success/10 border border-success/20 rounded-2xl p-4">
+                <p className="text-sm text-foreground font-bold mb-1">💵 Pay at doorstep</p>
+                <p className="text-xs text-muted-foreground">Keep ₹{total} ready. Our delivery partner will collect it.</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Total & Pay Button */}
+        <div className="bg-card rounded-2xl shadow-card p-4 mb-4">
+          <div className="flex justify-between mb-1">
+            <span className="text-muted-foreground text-sm">Subtotal</span>
+            <span className="font-bold text-foreground">₹{total}</span>
+          </div>
+          <div className="flex justify-between mb-1">
+            <span className="text-muted-foreground text-sm">Delivery</span>
+            <span className="font-bold text-success text-sm">FREE</span>
+          </div>
+          <div className="border-t border-border pt-2 mt-2 flex justify-between">
+            <span className="font-bold text-foreground">Total</span>
+            <span className="font-bold text-primary text-lg">₹{total}</span>
+          </div>
+        </div>
+
+        <button
+          onClick={handlePlaceOrder}
+          disabled={!paymentMethod}
+          className={`w-full font-bold py-4 rounded-2xl shadow-elevated transition-all flex items-center justify-center gap-2 ${
+            paymentMethod
+              ? 'gradient-primary text-primary-foreground hover:scale-[1.02]'
+              : 'bg-muted text-muted-foreground cursor-not-allowed'
+          }`}
+        >
+          {paymentMethod === 'cod' ? (
+            <>
+              <Banknote size={20} /> Place Order · ₹{total}
+            </>
+          ) : (
+            <>
+              <CreditCard size={20} /> Pay ₹{total}
+            </>
+          )}
+        </button>
+      </div>
+    );
+  }
+
+  // Grocery List Screen
   return (
     <div className="min-h-screen pb-20 px-4 pt-6 max-w-lg mx-auto">
       <div className="flex justify-between items-center mb-4">
         <div>
-          <h1 className="text-2xl text-foreground">Groceries 🛒</h1>
+          <h1 className="text-2xl font-bold text-foreground">Groceries 🛒</h1>
           <p className="text-sm text-muted-foreground">{checkedCount}/{groceryList.length} items done</p>
         </div>
         <div className="gradient-primary text-primary-foreground px-3 py-1.5 rounded-full text-sm font-bold">
