@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Mail, Lock, ArrowRight, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import frizoLogo from '@/assets/frizo-logo.png';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
