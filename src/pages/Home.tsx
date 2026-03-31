@@ -3,6 +3,7 @@ import { useApp } from '@/context/AppContext';
 import { weeklyPlan } from '@/lib/data';
 import { Flame, TrendingDown, Clock, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import frizoLogo from '@/assets/frizo-logo.png';
 
 const Home = () => {
   const { budget, spent, streak } = useApp();
@@ -25,9 +26,12 @@ const Home = () => {
       <motion.div variants={container} initial="hidden" animate="show">
         {/* Header */}
         <motion.div variants={item} className="flex justify-between items-center mb-6">
-          <div>
-            <p className="text-muted-foreground text-sm font-semibold">Good Morning! 👋</p>
-            <h1 className="text-2xl text-foreground">Frizo</h1>
+          <div className="flex items-center gap-3">
+            <img src={frizoLogo} alt="Frizo" className="w-12 h-12 object-contain" />
+            <div>
+              <p className="text-muted-foreground text-sm font-semibold">Good Morning! 👋</p>
+              <h1 className="text-2xl text-foreground">Frizo</h1>
+            </div>
           </div>
           <div className="flex items-center gap-1 gradient-primary text-primary-foreground px-3 py-1.5 rounded-full text-sm font-bold">
             <Flame size={16} /> {streak} days
