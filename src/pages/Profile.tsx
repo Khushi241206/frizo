@@ -1,10 +1,18 @@
 import { motion } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
-import { User, Flame, TrendingDown, Target, IndianRupee, UtensilsCrossed, Heart } from 'lucide-react';
+import { User, Flame, TrendingDown, Target, IndianRupee, UtensilsCrossed, Heart, LogOut, MapPin } from 'lucide-react';
 
 const Profile = () => {
-  const { budget, spent, streak, preference } = useApp();
+  const { budget, spent, streak, preference, signOut } = useApp();
   const saved = budget - spent;
+
+  const prefLabels: Record<string, string> = {
+    veg: 'Vegetarian 🥬',
+    nonveg: 'Non-Vegetarian 🍗',
+    egg: 'Eggetarian 🥚',
+    vegan: 'Vegan 🌱',
+    jain: 'Jain 🙏',
+  };
 
   const stats = [
     { icon: Target, label: 'Budget', value: `₹${budget.toLocaleString()}`, color: 'text-primary' },
@@ -15,7 +23,6 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen pb-20 px-4 pt-6 max-w-lg mx-auto">
-      {/* Profile Header */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -27,11 +34,10 @@ const Profile = () => {
         <h1 className="text-2xl text-foreground">Student Chef 👨‍🍳</h1>
         <p className="text-muted-foreground text-sm flex items-center justify-center gap-1">
           <Heart size={12} className="text-primary" />
-          {preference === 'veg' ? 'Vegetarian' : preference === 'nonveg' ? 'Non-Veg' : 'Eggetarian'}
+          {prefLabels[preference] || preference}
         </p>
       </motion.div>
 
-      {/* Savings Card */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -43,7 +49,6 @@ const Profile = () => {
         <p className="text-primary-foreground/70 text-sm mt-1">🎉 Amazing work!</p>
       </motion.div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-3 mb-6">
         {stats.map(({ icon: Icon, label, value, color }, i) => (
           <motion.div
@@ -60,7 +65,6 @@ const Profile = () => {
         ))}
       </div>
 
-      {/* Achievements */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -69,7 +73,7 @@ const Profile = () => {
         <h2 className="text-lg text-foreground mb-3 flex items-center gap-2">
           <UtensilsCrossed size={18} className="text-primary" /> Achievements
         </h2>
-        <div className="space-y-2">
+        <div className="space-y-2 mb-6">
           {[
             { emoji: '🔥', title: '5 Day Streak!', desc: 'Planned meals for 5 days straight' },
             { emoji: '💰', title: 'Budget Pro', desc: 'Stayed under budget this week' },
@@ -85,6 +89,13 @@ const Profile = () => {
           ))}
         </div>
       </motion.div>
+
+      <button
+        onClick={signOut}
+        className="w-full bg-destructive/10 text-destructive font-bold py-3 rounded-2xl flex items-center justify-center gap-2 hover:bg-destructive/20 transition-colors"
+      >
+        <LogOut size={18} /> Logout
+      </button>
     </div>
   );
 };
