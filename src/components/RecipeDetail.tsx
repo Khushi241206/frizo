@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Clock, Flame, IndianRupee, MapPin } from 'lucide-react';
+import { Clock, Flame, IndianRupee, MapPin, Play } from 'lucide-react';
 import type { Meal } from '@/lib/data';
 
 interface RecipeDetailProps {
@@ -49,6 +49,28 @@ const RecipeDetail = ({ meal, open, onClose }: RecipeDetailProps) => {
               {tag}
             </span>
           ))}
+        </div>
+
+        {/* Recipe Video */}
+        <div className="mb-4">
+          <h3 className="font-bold text-foreground text-sm mb-2">🎬 Watch Recipe Video</h3>
+          <div className="relative rounded-xl overflow-hidden aspect-video bg-secondary">
+            <iframe
+              className="w-full h-full"
+              src={`https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(meal.name + ' recipe indian')}`}
+              title={`${meal.name} recipe video`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+          <a
+            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(meal.name + ' recipe')}`}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-primary"
+          >
+            <Play size={12} /> More videos on YouTube
+          </a>
         </div>
 
         {/* Ingredients */}
