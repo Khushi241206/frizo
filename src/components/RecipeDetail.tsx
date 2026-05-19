@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Clock, Flame, IndianRupee, MapPin, Youtube } from 'lucide-react';
+import { Clock, Flame, IndianRupee, MapPin, Play } from 'lucide-react';
 import type { Meal } from '@/lib/data';
 
 interface RecipeDetailProps {
