@@ -27,13 +27,13 @@ const Auth = () => {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin },
+          options: {
+            emailRedirectTo: window.location.origin,
+            data: { full_name: name },
+          },
         });
         if (error) throw error;
-        toast({
-          title: 'Account created! 🎉',
-          description: 'Check your email to verify your account.',
-        });
+        setPendingVerifyEmail(email);
       }
     } catch (error: any) {
       toast({
