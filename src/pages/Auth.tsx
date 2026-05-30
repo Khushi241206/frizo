@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Mail, Lock, ArrowRight, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import frizoLogo from '@/assets/frizo-logo.png';
+import VerifyEmail from '@/components/VerifyEmail';
 
 const Auth = () => {
+  const [pendingVerifyEmail, setPendingVerifyEmail] = useState<string | null>(null);
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
