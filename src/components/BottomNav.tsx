@@ -1,11 +1,12 @@
-import { Home, CalendarDays, ShoppingCart, User } from 'lucide-react';
+import { Home, CalendarDays, ShoppingCart, User, BookOpen } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const tabs = [
   { icon: Home, label: 'Home', path: '/' },
   { icon: CalendarDays, label: 'Plan', path: '/plan' },
-  { icon: ShoppingCart, label: 'Groceries', path: '/groceries' },
+  { icon: BookOpen, label: 'Recipes', path: '/recipes' },
+  { icon: ShoppingCart, label: 'Grocery', path: '/groceries' },
   { icon: User, label: 'Profile', path: '/profile' },
 ];
 
