@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { Mail, Lock, ArrowRight, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import frizoLogo from '@/assets/frizo-logo.png';
+import VerifyEmail from '@/components/VerifyEmail';
 
 const Auth = () => {
+  const [pendingVerifyEmail, setPendingVerifyEmail] = useState<string | null>(null);
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,13 +27,13 @@ const Auth = () => {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin },
+          options: {
+            emailRedirectTo: window.location.origin,
+            data: { full_name: name },
+          },
         });
         if (error) throw error;
-        toast({
-          title: 'Account created! 🎉',
-          description: 'Check your email to verify your account.',
-        });
+        setPendingVerifyEmail(email);
       }
     } catch (error: any) {
       toast({
@@ -45,12 +47,22 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 gradient-primary">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 gradient-primary py-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-sm"
       >
+        <AnimatePresence mode="wait">
+          {pendingVerifyEmail ? (
+            <motion.div key="verify" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <VerifyEmail
+                email={pendingVerifyEmail}
+                onBack={() => setPendingVerifyEmail(null)}
+              />
+            </motion.div>
+          ) : (
+            <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
         {/* Logo */}
         <div className="text-center mb-8">
           <motion.img
@@ -129,6 +141,9 @@ const Auth = () => {
             </button>
           </p>
         </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </div>
   );
