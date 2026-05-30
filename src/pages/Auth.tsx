@@ -141,6 +141,9 @@ const Auth = () => {
             </button>
           </p>
         </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </div>
   );
