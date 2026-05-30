@@ -56,6 +56,7 @@ const AppRoutes = () => {
         <Route path="/" element={<Home />} />
         <Route path="/plan" element={<MealPlan />} />
         <Route path="/groceries" element={<Groceries />} />
+        <Route path="/recipes" element={<Recipes />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
