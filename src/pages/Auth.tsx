@@ -47,12 +47,22 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 gradient-primary">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 gradient-primary py-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-sm"
       >
+        <AnimatePresence mode="wait">
+          {pendingVerifyEmail ? (
+            <motion.div key="verify" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <VerifyEmail
+                email={pendingVerifyEmail}
+                onBack={() => setPendingVerifyEmail(null)}
+              />
+            </motion.div>
+          ) : (
+            <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
         {/* Logo */}
         <div className="text-center mb-8">
           <motion.img
