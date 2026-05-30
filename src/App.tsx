@@ -11,6 +11,7 @@ import Home from "@/pages/Home";
 import MealPlan from "@/pages/MealPlan";
 import Groceries from "@/pages/Groceries";
 import Profile from "@/pages/Profile";
+import Recipes from "@/pages/Recipes";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
