@@ -132,35 +132,34 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [groceryList, setGroceryList] = useState<GroceryItem[]>(() => buildGroceryList(getDefaultPlan()));
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        setTimeout(async () => {
-          const { data } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .single();
-          if (data) {
-            if (data.location && data.food_preference) {
-              setOnboarded(true);
-            }
-            if (data.monthly_budget) setBudget(data.monthly_budget);
-            if (data.food_preference) setPreference(data.food_preference);
-          }
+    const loadMock = () => {
+      const raw = localStorage.getItem('frizo_mock_user');
+      if (raw) {
+        try {
+          const mock = JSON.parse(raw);
+          setUser({ id: mock.id, phone: mock.phone } as unknown as User);
+          setOnboarded(localStorage.getItem('frizo_onboarded') === 'true');
           setLoading(false);
-        }, 0);
-      } else {
-        setLoading(false);
+          return true;
+        } catch {
+          localStorage.removeItem('frizo_mock_user');
+        }
       }
-    });
+      return false;
+    };
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (!session?.user) setLoading(false);
-    });
+    if (loadMock()) {
+      const onAuthChanged = () => loadMock();
+      window.addEventListener('frizo:auth-changed', onAuthChanged);
+      return () => window.removeEventListener('frizo:auth-changed', onAuthChanged);
+    }
 
-    return () => subscription.unsubscribe();
+    const onAuthChanged = () => {
+      if (loadMock()) return;
+    };
+    window.addEventListener('frizo:auth-changed', onAuthChanged);
+    setLoading(false);
+    return () => window.removeEventListener('frizo:auth-changed', onAuthChanged);
   }, []);
 
   const toggleGroceryItem = (id: string) => {
