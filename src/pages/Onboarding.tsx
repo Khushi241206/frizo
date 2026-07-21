@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
 import { ArrowRight, MapPin, Search } from 'lucide-react';
 import { indianCities, foodPreferences, cuisinePreferences } from '@/lib/data';
-import { supabase } from '@/integrations/supabase/client';
+
 
 const Onboarding = () => {
   const [step, setStep] = useState(0);
