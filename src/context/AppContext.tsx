@@ -204,9 +204,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    localStorage.removeItem('frizo_mock_user');
+    localStorage.removeItem('frizo_onboarded');
     setOnboarded(false);
     setUser(null);
+    window.dispatchEvent(new Event('frizo:auth-changed'));
   };
 
   return (
