@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
 import { ArrowRight, MapPin, Search } from 'lucide-react';
 import { indianCities, foodPreferences, cuisinePreferences } from '@/lib/data';
-import { supabase } from '@/integrations/supabase/client';
+
 
 const Onboarding = () => {
   const [step, setStep] = useState(0);
@@ -36,16 +36,10 @@ const Onboarding = () => {
     setBudget(budget);
     setPreference(selectedPref);
     setOnboarded(true);
-
-    // Save to profile
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      await supabase.from('profiles').update({
-        location,
-        food_preference: selectedPref,
-        monthly_budget: budget,
-      }).eq('user_id', user.id);
-    }
+    localStorage.setItem('frizo_onboarded', 'true');
+    localStorage.setItem('frizo_profile', JSON.stringify({
+      location, food_preference: selectedPref, monthly_budget: budget, cuisines: selectedCuisines,
+    }));
 
     navigate('/');
   };
